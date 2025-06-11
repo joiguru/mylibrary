@@ -4,39 +4,79 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>My Free PDF Library</title>
+  
+  <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
+  <!-- Styles -->
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #f0f0f0;
+      color: #333;
       padding: 20px;
+      transition: background 0.3s, color 0.3s;
     }
 
     h1 {
       text-align: center;
+      margin-bottom: 20px;
     }
 
     #searchBox {
       width: 90%;
       max-width: 600px;
-      padding: 10px;
+      padding: 12px 20px;
       font-size: 16px;
+      margin: 0 auto 20px auto;
       display: block;
-      margin: 20px auto;
-      border-radius: 5px;
+      border-radius: 25px;
       border: 1px solid #ccc;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      outline: none;
+      transition: 0.3s;
+    }
+
+    #searchBox:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 8px rgba(0,123,255,0.2);
+    }
+
+    button {
+      margin: 10px auto 20px auto;
+      display: block;
+      padding: 10px 20px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 25px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
     }
 
     .book {
       background: white;
-      padding: 10px;
+      padding: 15px;
       margin: 10px auto;
       border-radius: 8px;
       width: 90%;
       max-width: 600px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .book:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
     .book-content {
@@ -45,14 +85,16 @@
     }
 
     .book img {
-      width: 80px;
-      height: auto;
+      width: 90px;
+      height: 130px;
+      object-fit: cover;
       margin-right: 15px;
-      border-radius: 6px;
+      border-radius: 8px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.1);
     }
 
     .book h2 {
-      margin: 0;
+      margin: 0 0 10px 0;
       font-size: 18px;
     }
 
@@ -60,13 +102,45 @@
       text-decoration: none;
       color: #0066cc;
     }
+
+    /* Responsive Design */
+    @media (max-width: 500px) {
+      .book-content {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .book img {
+        margin: 0 0 10px 0;
+      }
+
+      .book h2 {
+        font-size: 16px;
+      }
+    }
+
+    /* Dark Mode */
+    .dark-mode {
+      background-color: #121212;
+      color: #eee;
+    }
+
+    .dark-mode .book {
+      background: #1e1e1e;
+    }
+
+    .dark-mode #searchBox {
+      background: #1e1e1e;
+      color: #fff;
+      border-color: #555;
+    }
   </style>
 </head>
-<body style="background-color: aqua;">
+<body>
   <h1>My Free Book Library</h1>
 
+  <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
   <input type="text" id="searchBox" placeholder="Search books..." oninput="fuzzySearch()">
-
   <div id="bookContainer"></div>
 
   <script>
@@ -115,31 +189,34 @@
     }
 
     async function fetchBooksFromSheet() {
-  try {
-    const res = await fetch(sheetUrl);
-    const csvText = await res.text();
+      try {
+        const res = await fetch(sheetUrl);
+        const csvText = await res.text();
 
-    const parsed = Papa.parse(csvText, {
-      header: true,
-      skipEmptyLines: true
-    });
+        const parsed = Papa.parse(csvText, {
+          header: true,
+          skipEmptyLines: true
+        });
 
-    books = parsed.data.map(row => ({
-      title: row["Title"],
-      link: row["Link"],
-      image: row["Image"]
-    }));
+        books = parsed.data.map(row => ({
+          title: row["Title"],
+          link: row["Link"],
+          image: row["Image"]
+        }));
 
-    fuse = new Fuse(books, options);
-    renderBooks(books);
-  } catch (err) {
-    container.innerHTML = "<p style='text-align:center;color:red;'>Failed to load book list</p>";
-    console.error("Error fetching books:", err);
-  }
-}
-fetchBooksFromSheet();
+        fuse = new Fuse(books, options);
+        renderBooks(books);
+      } catch (err) {
+        container.innerHTML = "<p style='text-align:center;color:red;'>Failed to load book list</p>";
+        console.error("Error fetching books:", err);
+      }
+    }
 
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+    }
 
+    fetchBooksFromSheet();
   </script>
 </body>
 </html>
