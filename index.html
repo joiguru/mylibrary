@@ -41,41 +41,57 @@
 <body style="background-color: aqua;">
   <h1>My Free Book Library</h1>
 
-  <!-- Search Input -->
   <input type="text" id="searchBox" placeholder="Search books..." onkeyup="searchBooks()">
 
-  <!-- Book List -->
-  <div id="bookContainer">
-    <div class="book">
-      <h2>SSC Maths book DISHA PUBLICATION</h2>
-      <p><a href="https://drive.google.com/file/d/1-9DsQUUIEtEKd2QrXRAnfHW5EgyyFjzb/view?usp=drive_link" target="_blank">Download/View PDF</a></p>
-    </div>
+  <div id="bookContainer"></div>
 
-    <div class="book">
-      <h2>Thomas calculus</h2>
-      <p><a href="https://drive.google.com/file/d/1hlRp3rYh0erP2XxIe9G19D0_WE2Nf0Ko/view?usp=drive_link" target="_blank">Download/View PDF</a></p>
-    </div>
+  <!-- Fuse.js for fuzzy search -->
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
 
-    <!-- Add more books here -->
-  </div>
-
-  <!-- JavaScript for Search -->
   <script>
-    function searchBooks() {
-      const input = document.getElementById("searchBox");
-      const filter = input.value.toUpperCase();
-      const container = document.getElementById("bookContainer");
-      const books = container.getElementsByClassName("book");
+    // Book data
+    const books = [
+      {
+        title: "SSC Maths book DISHA PUBLICATION",
+        link: "https://drive.google.com/file/d/1-9DsQUUIEtEKd2QrXRAnfHW5EgyyFjzb/view?usp=drive_link"
+      },
+      {
+        title: "Thomas calculus",
+        link: "https://drive.google.com/file/d/1hlRp3rYh0erP2XxIe9G19D0_WE2Nf0Ko/view?usp=drive_link"
+      },
+      // Add more books here
+    ];
 
-      for (let i = 0; i < books.length; i++) {
-        const title = books[i].getElementsByTagName("h2")[0];
-        const textValue = title.textContent || title.innerText;
-        if (textValue.toUpperCase().indexOf(filter) > -1) {
-          books[i].style.display = "";
-        } else {
-          books[i].style.display = "none";
-        }
+    // Show all books initially
+    const container = document.getElementById("bookContainer");
+    function displayBooks(list) {
+      container.innerHTML = "";
+      list.forEach(book => {
+        const bookDiv = document.createElement("div");
+        bookDiv.className = "book";
+        bookDiv.innerHTML = `<h2>${book.title}</h2>
+                             <p><a href="${book.link}" target="_blank">Download/View PDF</a></p>`;
+        container.appendChild(bookDiv);
+      });
+    }
+
+    displayBooks(books); // show all initially
+
+    // Fuse.js config
+    const fuse = new Fuse(books, {
+      keys: ['title'],
+      threshold: 0.4 // lower = stricter, higher = more tolerant
+    });
+
+    function searchBooks() {
+      const input = document.getElementById("searchBox").value;
+      if (!input.trim()) {
+        displayBooks(books); // show all if empty
+        return;
       }
+      const result = fuse.search(input);
+      const matchedBooks = result.map(r => r.item);
+      displayBooks(matchedBooks);
     }
   </script>
 </body>
