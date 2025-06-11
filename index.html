@@ -37,13 +37,6 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
-    .book img {
-  max-width: 80px;
-  height: auto;
-  border-radius: 4px;
-    }
-
-
     a {
       text-decoration: none;
       color: #0066cc;
@@ -63,12 +56,10 @@
       {
         title: "SSC Maths book DISHA PUBLICATION",
         link: "https://drive.google.com/file/d/1-9DsQUUIEtEKd2QrXRAnfHW5EgyyFjzb/view?usp=drive_link"
-        image: "https://m.media-amazon.com/images/I/516C79W7nML._SY445_SX342_.jpg" // Replace with your actual image URL
       },
       {
         title: "Thomas calculus",
         link: "https://drive.google.com/file/d/1hlRp3rYh0erP2XxIe9G19D0_WE2Nf0Ko/view?usp=drive_link"
-        image: "https://mathematicbooks.com/wp-content/uploads/2024/02/511Nv8Rt95L.jpg" // Replace with actual image
       },
       // Add more books here
     ];
@@ -81,28 +72,22 @@
     const fuse = new Fuse(books, options);
     const container = document.getElementById("bookContainer");
 
-function renderBooks(filteredBooks) {
-  container.innerHTML = "";
-  if (filteredBooks.length === 0) {
-    container.innerHTML = "<p style='text-align:center;'>No books found</p>";
-    return;
-  }
-  filteredBooks.forEach(book => {
-    const div = document.createElement("div");
-    div.className = "book";
-    div.innerHTML = `
-      <div style="display: flex; align-items: center;">
-        <img src="${book.image}" alt="${book.title}" style="width: 80px; height: auto; margin-right: 15px; border-radius: 4px;">
-        <div>
-          <h2 style="margin: 0 0 5px;">${book.title}</h2>
+    function renderBooks(filteredBooks) {
+      container.innerHTML = "";
+      if (filteredBooks.length === 0) {
+        container.innerHTML = "<p style='text-align:center;'>No books found</p>";
+        return;
+      }
+      filteredBooks.forEach(book => {
+        const div = document.createElement("div");
+        div.className = "book";
+        div.innerHTML = `
+          <h2>${book.title}</h2>
           <p><a href="${book.link}" target="_blank">Download/View PDF</a></p>
-        </div>
-      </div>
-    `;
-    container.appendChild(div);
-  });
-}
-
+        `;
+        container.appendChild(div);
+      });
+    }
 
     function fuzzySearch() {
       const input = document.getElementById("searchBox").value;
