@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>My Free PDF Library</title>
-  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script> <!-- Fuse.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -37,6 +37,23 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
+    .book-content {
+      display: flex;
+      align-items: center;
+    }
+
+    .book img {
+      width: 80px;
+      height: auto;
+      margin-right: 15px;
+      border-radius: 6px;
+    }
+
+    .book h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
     a {
       text-decoration: none;
       color: #0066cc;
@@ -46,27 +63,29 @@
 <body style="background-color: aqua;">
   <h1>My Free Book Library</h1>
 
+  <!-- Search Input -->
   <input type="text" id="searchBox" placeholder="Search books..." oninput="fuzzySearch()">
 
+  <!-- Book List -->
   <div id="bookContainer"></div>
 
   <script>
-    // Your books
     const books = [
       {
         title: "SSC Maths book DISHA PUBLICATION",
-        link: "https://drive.google.com/file/d/1-9DsQUUIEtEKd2QrXRAnfHW5EgyyFjzb/view?usp=drive_link"
+        link: "https://drive.google.com/file/d/1-9DsQUUIEtEKd2QrXRAnfHW5EgyyFjzb/view?usp=drive_link",
+        image: "https://m.media-amazon.com/images/I/516C79W7nML._SY445_SX342_.jpg"
       },
       {
         title: "Thomas calculus",
-        link: "https://drive.google.com/file/d/1hlRp3rYh0erP2XxIe9G19D0_WE2Nf0Ko/view?usp=drive_link"
-      },
-      // Add more books here
+        link: "https://drive.google.com/file/d/1hlRp3rYh0erP2XxIe9G19D0_WE2Nf0Ko/view?usp=drive_link",
+        image: "https://mathematicbooks.com/wp-content/uploads/2024/02/511Nv8Rt95L.jpg"
+      }
     ];
 
     const options = {
       keys: ['title'],
-      threshold: 0.4 // Controls fuzziness. Lower = stricter, higher = more forgiving
+      threshold: 0.4
     };
 
     const fuse = new Fuse(books, options);
@@ -82,8 +101,13 @@
         const div = document.createElement("div");
         div.className = "book";
         div.innerHTML = `
-          <h2>${book.title}</h2>
-          <p><a href="${book.link}" target="_blank">Download/View PDF</a></p>
+          <div class="book-content">
+            <img src="${book.image}" alt="${book.title}">
+            <div>
+              <h2>${book.title}</h2>
+              <p><a href="${book.link}" target="_blank">Download/View PDF</a></p>
+            </div>
+          </div>
         `;
         container.appendChild(div);
       });
@@ -100,7 +124,7 @@
       renderBooks(matchedBooks);
     }
 
-    // Initial load
+    // Initial render
     renderBooks(books);
   </script>
 </body>
