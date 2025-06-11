@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>My Free PDF Library</title>
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
   <style>
@@ -63,76 +63,78 @@
 <body style="background-color: aqua;">
   <h1>My Free Book Library</h1>
 
-  <!-- Search Input -->
   <input type="text" id="searchBox" placeholder="Search books..." oninput="fuzzySearch()">
 
-  <!-- Book List -->
   <div id="bookContainer"></div>
-<script>
-  const sheetUrl = "PASTE_YOUR_CSV_LINK_HERE";
 
-  let books = [];
+  <script>
+    const sheetUrl = "https://docs.google.com/spreadsheets/d/1_PttozhFBfj90u3T7Mcj1s0Np-kg_puv3SixAZxvC8w/edit?gid=0#gid=0";
 
-  const options = {
-    keys: ['title'],
-    threshold: 0.4
-  };
+    let books = [];
+    let fuse;
+    const container = document.getElementById("bookContainer");
 
-  let fuse;
-  const container = document.getElementById("bookContainer");
+    const options = {
+      keys: ['title'],
+      threshold: 0.4
+    };
 
-  function renderBooks(filteredBooks) {
-    container.innerHTML = "";
-    if (filteredBooks.length === 0) {
-      container.innerHTML = "<p style='text-align:center;'>No books found</p>";
-      return;
-    }
-    filteredBooks.forEach(book => {
-      const div = document.createElement("div");
-      div.className = "book";
-      div.innerHTML = `
-        <div class="book-content">
-          <img src="${book.image}" alt="${book.title}">
-          <div>
-            <h2>${book.title}</h2>
-            <p><a href="${book.link}" target="_blank">Download/View PDF</a></p>
+    function renderBooks(filteredBooks) {
+      container.innerHTML = "";
+      if (filteredBooks.length === 0) {
+        container.innerHTML = "<p style='text-align:center;'>No books found</p>";
+        return;
+      }
+      filteredBooks.forEach(book => {
+        const div = document.createElement("div");
+        div.className = "book";
+        div.innerHTML = `
+          <div class="book-content">
+            <img src="${book.image}" alt="${book.title}">
+            <div>
+              <h2>${book.title}</h2>
+              <p><a href="${book.link}" target="_blank">Download/View PDF</a></p>
+            </div>
           </div>
-        </div>
-      `;
-      container.appendChild(div);
-    });
-  }
-
-  function fuzzySearch() {
-    const input = document.getElementById("searchBox").value;
-    if (input.trim() === "") {
-      renderBooks(books);
-      return;
-    }
-    const results = fuse.search(input);
-    const matchedBooks = results.map(result => result.item);
-    renderBooks(matchedBooks);
-  }
-
-  async function fetchBooksFromSheet() {
-    try {
-      const res = await fetch(sheetUrl);
-      const text = await res.text();
-      const lines = text.trim().split("\n").slice(1); // skip header
-      books = lines.map(line => {
-        const [title, link, image] = line.split(",");
-        return { title, link, image };
+        `;
+        container.appendChild(div);
       });
-      fuse = new Fuse(books, options);
-      renderBooks(books);
-    } catch (err) {
-      container.innerHTML = "<p style='text-align:center;color:red;'>Failed to load book list</p>";
-      console.error("Error:", err);
     }
-  }
 
-  fetchBooksFromSheet();
-</script>
+    function fuzzySearch() {
+      const input = document.getElementById("searchBox").value;
+      if (input.trim() === "") {
+        renderBooks(books);
+        return;
+      }
+      const results = fuse.search(input);
+      const matchedBooks = results.map(result => result.item);
+      renderBooks(matchedBooks);
+    }
 
+    async function fetchBooksFromSheet() {
+      try {
+        const res = await fetch(sheetUrl);
+        const text = await res.text();
+
+        const rows = text.trim().split("\n").slice(1); // Skip header
+        books = rows.map(row => {
+          const parts = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g).map(cell =>
+            cell.replace(/^"|"$/g, "").replace(/""/g, '"')
+          );
+          const [title, link, image] = parts;
+          return { title, link, image };
+        });
+
+        fuse = new Fuse(books, options);
+        renderBooks(books);
+      } catch (err) {
+        container.innerHTML = "<p style='text-align:center;color:red;'>Failed to load book list</p>";
+        console.error("Error fetching books:", err);
+      }
+    }
+
+    fetchBooksFromSheet();
+  </script>
 </body>
 </html>
