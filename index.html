@@ -68,64 +68,71 @@
 
   <!-- Book List -->
   <div id="bookContainer"></div>
+<script>
+  const sheetUrl = "PASTE_YOUR_CSV_LINK_HERE";
 
-  <script>
-    const books = [
-      {
-        title: "SSC Maths book DISHA PUBLICATION",
-        link: "https://drive.google.com/file/d/1-9DsQUUIEtEKd2QrXRAnfHW5EgyyFjzb/view?usp=drive_link",
-        image: "https://m.media-amazon.com/images/I/516C79W7nML._SY445_SX342_.jpg"
-      },
-      {
-        title: "Thomas calculus",
-        link: "https://drive.google.com/file/d/1hlRp3rYh0erP2XxIe9G19D0_WE2Nf0Ko/view?usp=drive_link",
-        image: "https://mathematicbooks.com/wp-content/uploads/2024/02/511Nv8Rt95L.jpg"
-      }
-    ];
+  let books = [];
 
-    const options = {
-      keys: ['title'],
-      threshold: 0.4
-    };
+  const options = {
+    keys: ['title'],
+    threshold: 0.4
+  };
 
-    const fuse = new Fuse(books, options);
-    const container = document.getElementById("bookContainer");
+  let fuse;
+  const container = document.getElementById("bookContainer");
 
-    function renderBooks(filteredBooks) {
-      container.innerHTML = "";
-      if (filteredBooks.length === 0) {
-        container.innerHTML = "<p style='text-align:center;'>No books found</p>";
-        return;
-      }
-      filteredBooks.forEach(book => {
-        const div = document.createElement("div");
-        div.className = "book";
-        div.innerHTML = `
-          <div class="book-content">
-            <img src="${book.image}" alt="${book.title}">
-            <div>
-              <h2>${book.title}</h2>
-              <p><a href="${book.link}" target="_blank">Download/View PDF</a></p>
-            </div>
+  function renderBooks(filteredBooks) {
+    container.innerHTML = "";
+    if (filteredBooks.length === 0) {
+      container.innerHTML = "<p style='text-align:center;'>No books found</p>";
+      return;
+    }
+    filteredBooks.forEach(book => {
+      const div = document.createElement("div");
+      div.className = "book";
+      div.innerHTML = `
+        <div class="book-content">
+          <img src="${book.image}" alt="${book.title}">
+          <div>
+            <h2>${book.title}</h2>
+            <p><a href="${book.link}" target="_blank">Download/View PDF</a></p>
           </div>
-        `;
-        container.appendChild(div);
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function fuzzySearch() {
+    const input = document.getElementById("searchBox").value;
+    if (input.trim() === "") {
+      renderBooks(books);
+      return;
+    }
+    const results = fuse.search(input);
+    const matchedBooks = results.map(result => result.item);
+    renderBooks(matchedBooks);
+  }
+
+  async function fetchBooksFromSheet() {
+    try {
+      const res = await fetch(sheetUrl);
+      const text = await res.text();
+      const lines = text.trim().split("\n").slice(1); // skip header
+      books = lines.map(line => {
+        const [title, link, image] = line.split(",");
+        return { title, link, image };
       });
+      fuse = new Fuse(books, options);
+      renderBooks(books);
+    } catch (err) {
+      container.innerHTML = "<p style='text-align:center;color:red;'>Failed to load book list</p>";
+      console.error("Error:", err);
     }
+  }
 
-    function fuzzySearch() {
-      const input = document.getElementById("searchBox").value;
-      if (input.trim() === "") {
-        renderBooks(books);
-        return;
-      }
-      const results = fuse.search(input);
-      const matchedBooks = results.map(result => result.item);
-      renderBooks(matchedBooks);
-    }
+  fetchBooksFromSheet();
+</script>
 
-    // Initial render
-    renderBooks(books);
-  </script>
 </body>
 </html>
