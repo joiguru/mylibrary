@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>My Free PDF Library</title>
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -113,28 +115,30 @@
     }
 
     async function fetchBooksFromSheet() {
-      try {
-        const res = await fetch(sheetUrl);
-        const text = await res.text();
+  try {
+    const res = await fetch(sheetUrl);
+    const csvText = await res.text();
 
-        const rows = text.trim().split("\n").slice(1); // Skip header
-        books = rows.map(row => {
-          const parts = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g).map(cell =>
-            cell.replace(/^"|"$/g, "").replace(/""/g, '"')
-          );
-          const [title, link, image] = parts;
-          return { title, link, image };
-        });
+    const parsed = Papa.parse(csvText, {
+      header: true,
+      skipEmptyLines: true
+    });
 
-        fuse = new Fuse(books, options);
-        renderBooks(books);
-      } catch (err) {
-        container.innerHTML = "<p style='text-align:center;color:red;'>Failed to load book list</p>";
-        console.error("Error fetching books:", err);
-      }
-    }
+    books = parsed.data.map(row => ({
+      title: row["Title"],
+      link: row["Link"],
+      image: row["Image"]
+    }));
 
-    fetchBooksFromSheet();
+    fuse = new Fuse(books, options);
+    renderBooks(books);
+  } catch (err) {
+    container.innerHTML = "<p style='text-align:center;color:red;'>Failed to load book list</p>";
+    console.error("Error fetching books:", err);
+  }
+}
+
+
   </script>
 </body>
 </html>
