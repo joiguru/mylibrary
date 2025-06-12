@@ -159,79 +159,103 @@
 
 
   <script>
-    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQlR1VyLWCKzQGF3Y0e7lV0CL93m6Jh3rsOtNhNjhaleLt6ZBxbOcB6hNQ6cB9N68oh46_qmKYtQ5i2/pub?output=csv";
+  const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQlR1VyLWCKzQGF3Y0e7lV0CL93m6Jh3rsOtNhNjhaleLt6ZBxbOcB6hNQ6cB9N68oh46_qmKYtQ5i2/pub?output=csv";
 
-    let books = [];
-    let fuse;
-    const container = document.getElementById("bookContainer");
+  let books = [];
+  let fuse;
+  const container = document.getElementById("bookContainer");
 
-    const options = {
-      keys: ['title'],
-      threshold: 0.4
-    };
+  const options = {
+    keys: ['title'],
+    threshold: 0.4
+  };
 
-    function renderBooks(filteredBooks) {
-      container.innerHTML = "";
-      if (filteredBooks.length === 0) {
-        container.innerHTML = "<p style='text-align:center;'>No books found</p>";
-        return;
-      }
-      filteredBooks.forEach(book => {
-        const div = document.createElement("div");
-        div.className = "book";
-        div.innerHTML = `
-          <div class="book-content">
-            <img src="${book.image}" alt="${book.title}">
-            <div>
-              <h2>${book.title}</h2>
-              <p><a href="${book.link}" target="_blank">Download/View PDF</a></p>
-            </div>
+  function renderBooks(filteredBooks) {
+    container.innerHTML = "";
+    if (filteredBooks.length === 0) {
+      container.innerHTML = "<p style='text-align:center;'>No books found</p>";
+      return;
+    }
+    filteredBooks.forEach(book => {
+      const div = document.createElement("div");
+      div.className = "book";
+      div.innerHTML = `
+        <div class="book-content">
+          <img src="${book.image}" alt="${book.title}">
+          <div>
+            <h2>${book.title}</h2>
+            <p><a href="${book.link}" target="_blank">Download/View PDF</a></p>
           </div>
-        `;
-        container.appendChild(div);
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function fuzzySearch() {
+    const input = document.getElementById("searchBox").value;
+    if (input.trim() === "") {
+      renderBooks(books);
+      return;
+    }
+    const results = fuse.search(input);
+    const matchedBooks = results.map(result => result.item);
+    renderBooks(matchedBooks);
+  }
+
+  async function fetchBooksFromSheet() {
+    try {
+      const res = await fetch(sheetUrl);
+      const csvText = await res.text();
+
+      const parsed = Papa.parse(csvText, {
+        header: true,
+        skipEmptyLines: true
+      });
+
+      books = parsed.data.map(row => ({
+        title: row["Title"],
+        link: row["Link"],
+        image: row["Image"]
+      }));
+
+      fuse = new Fuse(books, options);
+      renderBooks(books);
+    } catch (err) {
+      container.innerHTML = "<p style='text-align:center;color:red;'>Failed to load book list</p>";
+      console.error("Error fetching books:", err);
+    }
+  }
+
+  function renderCusdis() {
+    if (window.Cusdis) {
+      const theme = document.body.classList.contains("dark-mode") ? "dark" : "light";
+      window.Cusdis.renderTo("cusdis_thread", {
+        host: "https://cusdis.com",
+        appId: "08e9a3de-755a-4fb2-8afa-165a288c8db1",
+        pageId: "suggest-book",
+        pageTitle: "Suggest a Book",
+        pageUrl: "https://joiguru.github.io/mylibrary/",
+        theme: theme
       });
     }
+  }
 
-    function fuzzySearch() {
-      const input = document.getElementById("searchBox").value;
-      if (input.trim() === "") {
-        renderBooks(books);
-        return;
-      }
-      const results = fuse.search(input);
-      const matchedBooks = results.map(result => result.item);
-      renderBooks(matchedBooks);
+  function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+    renderCusdis();
+  }
+
+  fetchBooksFromSheet();
+
+  // Ensure Cusdis loads once it's available
+  const observer = setInterval(() => {
+    if (window.Cusdis) {
+      renderCusdis();
+      clearInterval(observer);
     }
+  }, 200);
+</script>
 
-    async function fetchBooksFromSheet() {
-      try {
-        const res = await fetch(sheetUrl);
-        const csvText = await res.text();
-
-        const parsed = Papa.parse(csvText, {
-          header: true,
-          skipEmptyLines: true
-        });
-
-        books = parsed.data.map(row => ({
-          title: row["Title"],
-          link: row["Link"],
-          image: row["Image"]
-        }));
-
-        fuse = new Fuse(books, options);
-        renderBooks(books);
-      } catch (err) {
-        container.innerHTML = "<p style='text-align:center;color:red;'>Failed to load book list</p>";
-        console.error("Error fetching books:", err);
-      }
-    }
-
-    function toggleDarkMode() {
-      document.body.classList.toggle("dark-mode");
-    }
-
-    fetchBooksFromSheet();
-  </script>
 </body>
 </html>
