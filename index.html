@@ -4,12 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>My Free PDF Library</title>
-
+  
   <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
-
+  
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
@@ -27,6 +26,8 @@
       text-align: center;
       margin-bottom: 20px;
     }
+
+
 
     #searchBox {
       width: 90%;
@@ -104,7 +105,7 @@
       color: #0066cc;
     }
 
-    /* Responsive */
+    /* Responsive Design */
     @media (max-width: 500px) {
       .book-content {
         flex-direction: column;
@@ -135,6 +136,8 @@
       color: #fff;
       border-color: #555;
     }
+
+
   </style>
 </head>
 <body>
@@ -145,7 +148,15 @@
   <div id="bookContainer"></div>
 
   <h2 style="text-align:center;">Suggest a Book</h2>
-  <div id="cusdis_thread"></div>
+<div id="cusdis_thread"
+  data-host="https://cusdis.com"
+  data-app-id="08e9a3de-755a-4fb2-8afa-165a288c8db1"
+  data-page-id="suggest-book"
+  data-page-url="https://joiguru.github.io/mylibrary/"
+  data-page-title="Suggest a Book">
+</div>
+<script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+
 
   <script>
     const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQlR1VyLWCKzQGF3Y0e7lV0CL93m6Jh3rsOtNhNjhaleLt6ZBxbOcB6hNQ6cB9N68oh46_qmKYtQ5i2/pub?output=csv";
@@ -217,40 +228,10 @@
     }
 
     function toggleDarkMode() {
-      const isDark = document.body.classList.toggle("dark-mode");
-      const theme = isDark ? 'dark' : 'light';
-
-      if (window.Cusdis) {
-        window.Cusdis.renderTo("cusdis_thread", {
-          host: "https://cusdis.com",
-          appId: "08e9a3de-755a-4fb2-8afa-165a288c8db1",
-          pageId: "suggest-book",
-          pageTitle: "Suggest a Book",
-          pageUrl: "https://joiguru.github.io/mylibrary/",
-          theme: theme
-        });
-      }
+      document.body.classList.toggle("dark-mode");
     }
 
-    window.addEventListener("DOMContentLoaded", () => {
-      fetchBooksFromSheet();
-
-      const theme = document.body.classList.contains("dark-mode") ? 'dark' : 'light';
-
-      const interval = setInterval(() => {
-        if (window.Cusdis) {
-          window.Cusdis.renderTo("cusdis_thread", {
-            host: "https://cusdis.com",
-            appId: "08e9a3de-755a-4fb2-8afa-165a288c8db1",
-            pageId: "suggest-book",
-            pageTitle: "Suggest a Book",
-            pageUrl: "https://joiguru.github.io/mylibrary/",
-            theme: theme
-          });
-          clearInterval(interval);
-        }
-      }, 200);
-    });
+    fetchBooksFromSheet();
   </script>
 </body>
 </html>
