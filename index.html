@@ -118,23 +118,7 @@
       }
     }
 
-    /* Dark Mode */
-    .dark-mode {
-      background-color: #121212;
-      color: #eee;
-    }
-
-    .dark-mode .book {
-      background: #1e1e1e;
-    }
-
-    .dark-mode #searchBox {
-      background: #1e1e1e;
-      color: #fff;
-      border-color: #555;
-    }
-
-    /* Make Cusdis text blue */
+    /* Force Cusdis form text color to blue for visibility */
     iframe[data-cusdis] {
       filter: hue-rotate(180deg) saturate(3);
     }
@@ -143,7 +127,6 @@
 <body>
   <h1>My Free Book Library</h1>
 
-  <button id="themeToggle" onclick="toggleDarkMode()">Switch to Dark Mode</button>
   <input type="text" id="searchBox" placeholder="Search books..." oninput="fuzzySearch()">
   <div id="bookContainer"></div>
 
@@ -224,13 +207,6 @@
         container.innerHTML = "<p style='text-align:center;color:red;'>Failed to load book list</p>";
         console.error("Error fetching books:", err);
       }
-    }
-
-    function toggleDarkMode() {
-      const isDark = document.body.classList.toggle("dark-mode");
-      document.getElementById("themeToggle").innerText = isDark
-        ? "Switch to Light Mode"
-        : "Switch to Dark Mode";
     }
 
     fetchBooksFromSheet();
