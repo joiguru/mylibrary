@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>My Free PDF Library</title>
-  
+
   <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  
+
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
@@ -26,8 +26,6 @@
       text-align: center;
       margin-bottom: 20px;
     }
-
-
 
     #searchBox {
       width: 90%;
@@ -136,8 +134,6 @@
       color: #fff;
       border-color: #555;
     }
-
-
   </style>
 </head>
 <body>
@@ -148,15 +144,15 @@
   <div id="bookContainer"></div>
 
   <h2 style="text-align:center;">Suggest a Book</h2>
-<div id="cusdis_thread"
-  data-host="https://cusdis.com"
-  data-app-id="08e9a3de-755a-4fb2-8afa-165a288c8db1"
-  data-page-id="suggest-book"
-  data-page-url="https://joiguru.github.io/mylibrary/"
-  data-page-title="Suggest a Book">
-</div>
-<script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
-
+  <div id="cusdis_thread"
+    data-host="https://cusdis.com"
+    data-app-id="08e9a3de-755a-4fb2-8afa-165a288c8db1"
+    data-page-id="suggest-book"
+    data-page-url="https://joiguru.github.io/mylibrary/"
+    data-page-title="Suggest a Book"
+    data-theme="light">
+  </div>
+  <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
 
   <script>
     const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQlR1VyLWCKzQGF3Y0e7lV0CL93m6Jh3rsOtNhNjhaleLt6ZBxbOcB6hNQ6cB9N68oh46_qmKYtQ5i2/pub?output=csv";
@@ -228,7 +224,24 @@
     }
 
     function toggleDarkMode() {
-      document.body.classList.toggle("dark-mode");
+      const isDark = document.body.classList.toggle("dark-mode");
+      const theme = isDark ? 'dark' : 'light';
+
+      const cusdisContainer = document.getElementById("cusdis_thread");
+      cusdisContainer.setAttribute("data-theme", theme);
+
+      // Remove existing script
+      const existingScript = document.querySelector('script[src="https://cusdis.com/js/cusdis.es.js"]');
+      if (existingScript) {
+        existingScript.remove();
+      }
+
+      // Re-render Cusdis by injecting the script again
+      const newScript = document.createElement('script');
+      newScript.src = "https://cusdis.com/js/cusdis.es.js";
+      newScript.async = true;
+      newScript.defer = true;
+      document.body.appendChild(newScript);
     }
 
     fetchBooksFromSheet();
