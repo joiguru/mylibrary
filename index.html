@@ -232,20 +232,25 @@
       }
     }
 
-    window.onload = function () {
+    window.addEventListener("DOMContentLoaded", () => {
       fetchBooksFromSheet();
 
-      if (window.Cusdis) {
-        window.Cusdis.renderTo("cusdis_thread", {
-          host: "https://cusdis.com",
-          appId: "08e9a3de-755a-4fb2-8afa-165a288c8db1",
-          pageId: "suggest-book",
-          pageTitle: "Suggest a Book",
-          pageUrl: "https://joiguru.github.io/mylibrary/",
-          theme: 'light'
-        });
-      }
-    };
+      const theme = document.body.classList.contains("dark-mode") ? 'dark' : 'light';
+
+      const interval = setInterval(() => {
+        if (window.Cusdis) {
+          window.Cusdis.renderTo("cusdis_thread", {
+            host: "https://cusdis.com",
+            appId: "08e9a3de-755a-4fb2-8afa-165a288c8db1",
+            pageId: "suggest-book",
+            pageTitle: "Suggest a Book",
+            pageUrl: "https://joiguru.github.io/mylibrary/",
+            theme: theme
+          });
+          clearInterval(interval);
+        }
+      }, 200);
+    });
   </script>
 </body>
 </html>
