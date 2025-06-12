@@ -145,13 +145,16 @@
   <input type="text" id="searchBox" placeholder="Search books..." oninput="fuzzySearch()">
   <div id="bookContainer"></div>
 
-    <h2 style="text-align:center;">Suggest a Book</h2>
-<div class="commentbox" style="max-width: 600px; margin: 0 auto;"></div>
+  <h2 style="text-align:center;">Suggest a Book</h2>
+<div id="cusdis_thread"
+  data-host="https://cusdis.com"
+  data-app-id="08e9a3de-755a-4fb2-8afa-165a288c8db1"
+  data-page-id="suggest-book"
+  data-page-url="https://joiguru.github.io/mylibrary/"
+  data-page-title="Suggest a Book">
+</div>
+<script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
 
-<script src="https://unpkg.com/commentbox.io/dist/commentBox.min.js"></script>
-<script>
-  commentBox('5758522155335680-proj');
-</script>
 
   <script>
     const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQlR1VyLWCKzQGF3Y0e7lV0CL93m6Jh3rsOtNhNjhaleLt6ZBxbOcB6hNQ6cB9N68oh46_qmKYtQ5i2/pub?output=csv";
