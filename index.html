@@ -19,7 +19,6 @@
       background-color: #f0f0f0;
       color: #333;
       padding: 20px;
-      transition: background 0.3s, color 0.3s;
     }
 
     h1 {
@@ -29,10 +28,9 @@
 
     #bookCount {
       text-align: center;
-      font-size: 18px;
-      font-weight: 600;
       margin-bottom: 20px;
-      color: #007bff;
+      font-weight: bold;
+      color: #555;
     }
 
     #searchBox {
@@ -46,29 +44,11 @@
       border: 1px solid #ccc;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       outline: none;
-      transition: 0.3s;
     }
 
     #searchBox:focus {
       border-color: #007bff;
       box-shadow: 0 0 8px rgba(0,123,255,0.2);
-    }
-
-    button {
-      margin: 10px auto 20px auto;
-      display: block;
-      padding: 10px 20px;
-      border: none;
-      background-color: #007bff;
-      color: white;
-      border-radius: 25px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      background-color: #0056b3;
     }
 
     .book {
@@ -79,7 +59,6 @@
       width: 90%;
       max-width: 600px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      transition: transform 0.2s ease-in-out;
     }
 
     .book:hover {
@@ -126,15 +105,15 @@
       }
     }
 
-    /* Force Cusdis form text color to blue for visibility */
     iframe[data-cusdis] {
       filter: hue-rotate(180deg) saturate(3);
     }
   </style>
 </head>
 <body>
+
   <h1>My Free Book Library</h1>
-  <p id="bookCount">Loading book count...</p>
+  <div id="bookCount">Loading books...</div>
 
   <input type="text" id="searchBox" placeholder="Search books..." oninput="fuzzySearch()">
   <div id="bookContainer"></div>
@@ -155,18 +134,22 @@
     let books = [];
     let fuse;
     const container = document.getElementById("bookContainer");
+    const bookCountEl = document.getElementById("bookCount");
 
     const options = {
-      keys: ['title'],
+      keys: ['title', 'tags'],
       threshold: 0.4
     };
 
     function renderBooks(filteredBooks) {
       container.innerHTML = "";
+      bookCountEl.textContent = `Total Books: ${filteredBooks.length}`;
+
       if (filteredBooks.length === 0) {
         container.innerHTML = "<p style='text-align:center;'>No books found</p>";
         return;
       }
+
       filteredBooks.forEach(book => {
         const div = document.createElement("div");
         div.className = "book";
@@ -187,13 +170,11 @@
       const input = document.getElementById("searchBox").value;
       if (input.trim() === "") {
         renderBooks(books);
-        document.getElementById("bookCount").textContent = `Total Books Available: ${books.length}`;
         return;
       }
       const results = fuse.search(input);
       const matchedBooks = results.map(result => result.item);
       renderBooks(matchedBooks);
-      document.getElementById("bookCount").textContent = `Books Found: ${matchedBooks.length} of ${books.length}`;
     }
 
     async function fetchBooksFromSheet() {
@@ -209,23 +190,20 @@
         books = parsed.data.map(row => ({
           title: row["Title"],
           link: row["Link"],
-          image: row["Image"]
+          image: row["Image"],
+          tags: row["Tags"] || ""
         }));
 
         fuse = new Fuse(books, options);
         renderBooks(books);
-
-        // ✅ Set book count
-        document.getElementById("bookCount").textContent = `Total Books Available: ${books.length}`;
-
       } catch (err) {
         container.innerHTML = "<p style='text-align:center;color:red;'>Failed to load book list</p>";
-        document.getElementById("bookCount").textContent = "Failed to load book count";
         console.error("Error fetching books:", err);
       }
     }
 
     fetchBooksFromSheet();
   </script>
+
 </body>
 </html>
