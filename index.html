@@ -24,7 +24,15 @@
 
     h1 {
       text-align: center;
+      margin-bottom: 10px;
+    }
+
+    #bookCount {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 600;
       margin-bottom: 20px;
+      color: #007bff;
     }
 
     #searchBox {
@@ -126,6 +134,7 @@
 </head>
 <body>
   <h1>My Free Book Library</h1>
+  <p id="bookCount">Loading book count...</p>
 
   <input type="text" id="searchBox" placeholder="Search books..." oninput="fuzzySearch()">
   <div id="bookContainer"></div>
@@ -178,11 +187,13 @@
       const input = document.getElementById("searchBox").value;
       if (input.trim() === "") {
         renderBooks(books);
+        document.getElementById("bookCount").textContent = `Total Books Available: ${books.length}`;
         return;
       }
       const results = fuse.search(input);
       const matchedBooks = results.map(result => result.item);
       renderBooks(matchedBooks);
+      document.getElementById("bookCount").textContent = `Books Found: ${matchedBooks.length} of ${books.length}`;
     }
 
     async function fetchBooksFromSheet() {
@@ -203,8 +214,13 @@
 
         fuse = new Fuse(books, options);
         renderBooks(books);
+
+        // ✅ Set book count
+        document.getElementById("bookCount").textContent = `Total Books Available: ${books.length}`;
+
       } catch (err) {
         container.innerHTML = "<p style='text-align:center;color:red;'>Failed to load book list</p>";
+        document.getElementById("bookCount").textContent = "Failed to load book count";
         console.error("Error fetching books:", err);
       }
     }
